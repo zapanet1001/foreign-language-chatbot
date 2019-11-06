@@ -52,5 +52,6 @@ venv.bak/
 pip-selfcheck.json
 model.tflearn.*
 checkpoint
+data.pickle
 
 # End of https://www.gitignore.io/api/venv,macos

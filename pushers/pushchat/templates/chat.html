@@ -1,6 +1,7 @@
 <html>
     <head>
         <title></title>
+        
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <script src="//js.pusher.com/4.0/pusher.min.js"></script>
@@ -18,27 +19,31 @@
                 dataType: "json",
                 success: function (data) {
                     console.log('get_languages: SUCCESS!');
-                    console.log(data);
+                    // console.log(data);
                     $.each(JSON.parse(data),function(i,obj) {
                         // alert(obj.language+":"+obj.name);
                         var div_data="<option value="+obj.language+">"+obj.name+"</option>";
                         // alert(div_data);
                         $(div_data).appendTo('#dialog_options');
                         $(div_data).appendTo('#translation_options'); 
-                        console.log(obj.name);
+                        // console.log(obj.name);
                             });   
                 }
             });
 
             
-
+            chat = 0;
             function chat_line() { 
+
                 //PRINTS USER INPUT TO CHAT CONSOLE
                 var x =  document.getElementById("btn-input").value; 
                 var ul = document.getElementById("chat");
-                var li = document.createElement("li");
-                li.appendChild(document.createTextNode(x));
-                ul.appendChild(li);
+                var ul_li = document.createElement("ul");
+                ul_li.appendChild(document.createTextNode(x));
+                ul_li.setAttribute("id", "chat"+chat);
+                ul_li.setAttribute("onclick", "show_translation(this)");
+                ul.appendChild(ul_li);
+                console.log(ul);
 
                 //PRINTS ENTITIES FROM USER INPUT TO ENTITIES LIST
                 $.ajax({
@@ -51,9 +56,9 @@
                     },
                     success: function (data,) {
                         console.log('get_entities = SUCCESS!');
-                        console.log(data);
-                        console.log(data[0].name);
-                        console.log(data[0].metadata.wikipedia_url);
+                        // console.log(data);
+                        // console.log(data[0].name);
+                        // console.log(data[0].metadata.wikipedia_url);
 
                         var count =1;
                         data.forEach(function(entity) {
@@ -64,16 +69,16 @@
                             var a = document.createElement("a");
                             a.appendChild(document.createTextNode(x));
                             try{ 
-                                // li.href = entity.metadata.wikipedia_url
                                 a.setAttribute("href", entity.metadata.wikipedia_url);
+                                li.appendChild(a)
+                                li.setAttribute("id", "li"+count);
+                                ul.appendChild(li);
+                                count++;
                             }
                             catch(error) {
                                 console.log('error handled')
                             }
-                            li.appendChild(a)
-                            li.setAttribute("id", "li"+count);
-                            ul.appendChild(li);
-                            count++;
+                            
                         });
 
                         var list = document.getElementById("entity_list");
@@ -82,15 +87,52 @@
                             var l = document.getElementById("li"+count);
                             console.log(l);
                         }
-                        // for (var i = 0; i < lists.length; ++i) {
-                        //     // filter so that only lists with the class "foo" are counted
-                        //     console.log(lists);
-                        // }
                     }
                 });
+                chat++;
+                console.log("chat count: ", chat);
+            }
+
+            function show_translation(element) {
+                console.log("SHOW TRANSLATION: ");
+                console.log(element);
+                var id = element.id;
+                // console.log(id); //works up to here
+                var x =  document.getElementById(id).textContent; 
+                var y = $('#dialog_options option:selected').attr('value');
+                var z = $('#translation_options option:selected').attr('value');
+
+                var t;
+                $.ajax({
+                    type: "POST",
+                    url:"/ajax/get_translation/",
+                    dataType: "json",
+                    data: {
+                        user_input : x,
+                        chat_lang : y,
+                        translate_lang : z,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data,) {
+                        console.log('get_translation = SUCCESS!');
+                        console.log(data);
+
+                        //append the translated test to
+                        li = document.createElement("li");
+                        li.appendChild(document.createTextNode(data.translatedText));
+                        elem = document.getElementById(id);
+                        elem.appendChild(li);
+                        console.log(elem);
+
+
+                    }
+                });
+
+                
             } 
        
         </script>
+        
     </head>
     <body>
         <div class="container">
@@ -111,13 +153,13 @@
                         <div class="form-group">
                             <label for="exampleFormControlSelect1">Chat Language</label>
                             <select id="dialog_options" >
-                                    <option value="select"></option>
+                                    <option value="select" name ="chat_lang" id = "chatting"></option>
                             </select>
                         </div>
                         <div class="form-group">
                                 <label for="exampleFormControlSelect1">Translation Language</label>
                                 <select id="translation_options" >
-                                        <option value="select"></option>
+                                        <option value="select" name="translate_lang" id = "translating"></option>
                                 </select>
                             </div>
                         
@@ -165,151 +207,9 @@
 
             </div>
         </div>
-<!-- <script>
-    //initiate puhser with your application key
-    var pusher = new Pusher('61ac9db7f0d63277363f');
-    //subscribe to the channel you want to listen to
-    var my_channel = pusher.subscribe('a_channel');
-    //wait for an event to be triggered in that channel
-    my_channel.bind("an_event", function (data) {
-        // declare a variable new_message to hold the new chat messages
-        var new_message = `<li class="left clearfix"><span class="chat-img pull-left">
-                            <img src="http://placehold.it/50/55C1E7/fff&text=`+data.name+`" alt="User Avatar" class="img-circle">
-                        </span>
-                            <div class="chat-body clearfix">
-                                <div class="header">
-                                    <strong class="primary-font">`+data.name+`</strong> <small class="pull-right text-muted">
-                                </div>
-                                <p>
-                                   `+data.message+`
-                                </p>
-                            </div>
-                        </li>`;
-     //append the new message to the ul holding the chat messages
-    $('#chat').append(new_message);
-    });
-    //wait until the DOM is fully ready
-    $(document).ready(function(){
-    //add event listener to the chat button click 
-        $("#btn-chat").click(function(){
-    //get the currently typed message
-             var message = $('#btn-input').val();
 
-            $.post({
-                url: '/ajax/chat/',
-                data: {
-                'message': message
-                },
-                success: function (data) {
 
-                    $('#btn-input').val('');
-
-                }
-            });
-
-        })
-    })
-
-</script> -->
-<!-- <script>
-        $.ajax({
-            url: "/ajax/get_languages/",
-            type: 'get',
-            success: function (data) {
-              alert("Success");
-              var div = document.getElementById('jsondata');
-              div.innerHTML = div.innerHTML + data.foo;       
-        
-            }
-          });
-</script> -->
-    <!-- <script>
-        function loadLanguages() {
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("demo").innerHTML = this.responseText;
-                }
-            };
-            xhttp.open("GET", "https://translation.googleapis.com/language/translate/v2/languages", true);
-            xhttp.send();
-        }
-    </script> -->
-    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>
-            $(document).ready(function(){
-                $('btn-chat').click(function() {
-                    $.getJSON('/get_languages', function(data) {
-                        console.log('here')
-                        $.each(result, function(i, field){
-                            $("chat").append(field + " ");
-                        });
-                    });
-                });
-            });
-    </script> -->
-    <style>
-            .chat
-    {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
     
-    .chat li
-    {
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-        border-bottom: 1px dotted #B3A9A9;
-    }
-    
-    .chat li.left .chat-body
-    {
-        margin-left: 60px;
-    }
-    
-    .chat li.right .chat-body
-    {
-        margin-right: 60px;
-    }
-    
-    
-    .chat li .chat-body p
-    {
-        margin: 0;
-        color: #777777;
-    }
-    
-    .panel .slidedown .glyphicon, .chat .glyphicon
-    {
-        margin-right: 5px;
-    }
-    
-    .panel-body
-    {
-        overflow-y: scroll;
-        height: 250px;
-    }
-    
-    ::-webkit-scrollbar-track
-    {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        background-color: #F5F5F5;
-    }
-    
-    ::-webkit-scrollbar
-    {
-        width: 12px;
-        background-color: #F5F5F5;
-    }
-    
-    ::-webkit-scrollbar-thumb
-    {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-        background-color: #555;
-    }
-    
-    </style>
 </body>
 
 </html>

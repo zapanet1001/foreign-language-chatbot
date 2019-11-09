@@ -53,5 +53,9 @@ pip-selfcheck.json
 model.tflearn.*
 checkpoint
 data.pickle
-
+GoogleAuth/
+gui.py
+naturalLanguageDemo.py
+speechToTextDemo.py
+translationDemo.py
 # End of https://www.gitignore.io/api/venv,macos

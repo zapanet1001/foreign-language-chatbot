@@ -59,7 +59,7 @@ def get_entities(request):
     text = request.POST.get('user_input')
 
     #CREATE DOCUMENT
-    print("Text: ",format(text))
+    # print("Text: ",format(text))
     document = language.types.Document(
         content =  text, 
         type =  'PLAIN_TEXT',
@@ -71,17 +71,17 @@ def get_entities(request):
         document = document, 
         encoding_type='UTF32',
         )
-    print("ent_analysis: \n")
-    print(response.entities)
+    # print("ent_analysis: \n")
+    # print(response.entities)
     
     # print("ENTITIES: \n")
     # print(ent_analysis.getEntities())
-    for entity in response.entities:
-        print('=' * 20)
-        print('         name: {0}'.format(entity.name))
-        print('         type: {0}'.format(entity.type))
-        print('     metadata: {0}'.format(entity.metadata))
-        print('     salience: {0}'.format(entity.salience))
+    # for entity in response.entities:
+    #     print('=' * 20)
+    #     print('         name: {0}'.format(entity.name))
+    #     print('         type: {0}'.format(entity.type))
+    #     print('     metadata: {0}'.format(entity.metadata))
+    #     print('     salience: {0}'.format(entity.salience))
     
     # serialized = MessageToJson(response.entities)
     response = MessageToDict(response, preserving_proto_field_name = True)
@@ -90,3 +90,12 @@ def get_entities(request):
     print(desired_res)
     return JsonResponse(desired_res, safe=False)
 
+def get_translation(request):
+    #GET USER INPUT
+    text = request.POST.get('user_input')
+    chatIn = request.POST.get('chat_lang')
+    translateTo = request.POST.get('translate_lang')
+    print(text, " ", chatIn, " ", translateTo)
+    response = translate_client.translate(text, target_language = translateTo, source_language = chatIn)
+    print(response)
+    return JsonResponse(response, safe=False)

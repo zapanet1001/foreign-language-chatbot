@@ -114,6 +114,6 @@ def chat():
             
             print(random.choice(responses))
         else:
-            print("I don't quite understand, try again.")
+            print("I don't quite understand, try againg")
 
 chat()

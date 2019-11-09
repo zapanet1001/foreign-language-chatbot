@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^ajax/chat/$', views.broadcast),
     url(r'^ajax/get_languages/$', views.get_languages, name='get_languages'),
     url(r'^ajax/get_entities/$', views.get_entities, name='get_entities'),
+    url(r'^ajax/get_translation/$', views.get_translation, name='get_translation'),
 ]

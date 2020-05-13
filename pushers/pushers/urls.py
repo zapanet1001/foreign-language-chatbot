@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from pushchat import views
 from pushchat import views2
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^$', views.chat),
@@ -26,4 +28,4 @@ urlpatterns = [
     url(r'^ajax/get_entities/$', views.get_entities, name='get_entities'),
     url(r'^ajax/get_translation/$', views.get_translation, name='get_translation'),
     # url(r'^ajax/speak_input/$', views2.speak_input, name='speak_input'),
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

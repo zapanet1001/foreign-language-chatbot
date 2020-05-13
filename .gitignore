@@ -321,3 +321,5 @@ pip-selfcheck.json
 .history
 
 # End of https://www.gitignore.io/api/node,venv,macos,django,python,visualstudiocode
+
+GoogleAuth/

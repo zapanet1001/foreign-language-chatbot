@@ -25,5 +25,5 @@ urlpatterns = [
     url(r'^ajax/get_languages/$', views.get_languages, name='get_languages'),
     url(r'^ajax/get_entities/$', views.get_entities, name='get_entities'),
     url(r'^ajax/get_translation/$', views.get_translation, name='get_translation'),
-    url(r'^ajax/speak_input/$', views2.speak_input, name='speak_input'),
+    # url(r'^ajax/speak_input/$', views2.speak_input, name='speak_input'),
 ]

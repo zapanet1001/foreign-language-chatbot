@@ -33,7 +33,7 @@ from google.cloud.language import enums
 from google.protobuf.json_format import MessageToJson, MessageToDict
 
 #GOOGLE AUTH
-credential_path = "/Users/irenepolo/timBot/GoogleAuth/GoogleCloudKey_MyServiceAccount.json"
+credential_path = "./GoogleAuth/GoogleCloudKey_MyServiceAccount.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 # Instantiates a client
